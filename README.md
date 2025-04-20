@@ -1,4 +1,4 @@
-# 📘 Pokédex Interativa
+# [📘 Pokédex Interativa](https://gabriellyss.github.io/pokedex/)
 
 Uma Pokédex desenvolvida com HTML, CSS e JavaScript puro, que consome a [PokeAPI](https://pokeapi.co/) para exibir detalhes sobre os Pokémon da primeira geração. Este projeto foi desenvolvido como parte de um desafio do bootcamp **Desenvolvimento Frontend com Angular** da plataforma [DIO](https://www.dio.me/).
 
