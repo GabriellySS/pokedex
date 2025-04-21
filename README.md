@@ -17,7 +17,7 @@ Uma [Pokédex](https://gabriellyss.github.io/pokedex/) desenvolvida com HTML, CS
 ---
 
 ## 🧱 Estrutura do Projeto
-
+```
 pokedex/
 │
 ├── 📁 assets/
@@ -25,7 +25,12 @@ pokedex/
 │   │   ├── colors.css
 │   │   ├── global.css
 │   │   ├── pokedex.css
-│   │   └── pokemon.css
+│   │   ├── pokemon-tabs.css
+│   │   ├── pokemon-tabs-about.css   
+│   │   ├── pokemon-tabs-evolution.css
+│   │   ├── pokemon-tabs-location.css
+│   │   ├── pokemon-tabs-moves.css
+│   │   └── pokemon-tabs-stats.css
 │   ├── 📁 images/
 |   |   └── pokeball.svg
 │   └── 📁 js/
@@ -36,7 +41,7 @@ pokedex/
 │
 ├── index.html
 └── pokemon.html
-
+```
 ---
 
 ## 🖥 Como rodar o projeto localmente
