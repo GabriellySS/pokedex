@@ -8,17 +8,15 @@ async function convertPokeApiDetailToPokemon(pokeDetail) {
 
     const types = pokeDetail.types.map((typeSlot) => typeSlot.type.name)
     pokemon.types = types
-    pokemon.type = types[0] // tipo principal
+    pokemon.type = types[0]
 
-    // Imagem (fallback se não houver imagem no dream_world)
     pokemon.photo = pokeDetail.sprites.other['official-artwork'].front_default
-
-    pokemon.height = pokeDetail.height  // altura em decímetros
-    pokemon.weight = pokeDetail.weight  // peso em hectogramas
+    pokemon.height = pokeDetail.height
+    pokemon.weight = pokeDetail.weight
 
     const abilities = pokeDetail.abilities.map((abilitySlot) => abilitySlot.ability.name)
     pokemon.abilities = abilities
-    pokemon.ability = abilities[0]  // habilidade principal
+    pokemon.ability = abilities[0]
 
     pokemon.stats = pokeDetail.stats.map((stat) => ({
         name: stat.stat.name,
@@ -36,14 +34,47 @@ async function convertPokeApiDetailToPokemon(pokeDetail) {
 
         pokemon.specie = specieObj ? specieObj.genus : 'Unknown'
         pokemon.description = descriptionObj ? descriptionObj.flavor_text.replace(/\f/g, ' ') : 'No description found.'
+
+        // 🔁 EVOLUTION CHAIN
+        if (speciesData.evolution_chain && speciesData.evolution_chain.url) {
+            const evolutionResponse = await fetch(speciesData.evolution_chain.url)
+            const evolutionData = await evolutionResponse.json()
+
+            const evolutions = []
+
+            let evoChain = evolutionData.chain
+            do {
+                evolutions.push(evoChain.species.name)
+                evoChain = evoChain.evolves_to[0]
+            } while (evoChain && evoChain.hasOwnProperty('evolves_to'))
+
+            pokemon.evolutions = evolutions // ['bulbasaur', 'ivysaur', 'venusaur']
+        } else {
+            pokemon.evolutions = ['Unknown']
+        }
+
+        const locationResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokeDetail.id}/encounters`)
+        const locationData = await locationResponse.json()
+
+        const locations = locationData.map(loc => {
+            return loc.location_area.name
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, c => c.toUpperCase())
+        })
+
+        pokemon.locations = locations.length > 0 ? locations : ['Location unknown']
+
     } catch (error) {
-        console.error(`Erro ao buscar espécie do Pokémon ${pokemon.name}:`, error)
+        console.error(`[ERROR] Failed to fetch data from API for Pokémon ${pokemon.name} (ID: ${pokemon.number}):`, error)
         pokemon.specie = 'Unknown'
         pokemon.description = 'No description found.'
+        pokemon.evolutions = ['Unknown']
+        pokemon.locations = ['Location unknown']
     }
 
     return pokemon
 }
+
 
 async function getTopMovesWithDetails(moves) {
     const moveDetails = []
@@ -65,7 +96,7 @@ async function getTopMovesWithDetails(moves) {
                 })
             }
         } catch (err) {
-            console.error(`Erro ao buscar dados do move:`, err)
+            console.error(`[ERROR] Failed to fetch move data from API for Pokémon ${pokemon.name} (ID: ${pokemon.number}):`, err)
         }
     }
 

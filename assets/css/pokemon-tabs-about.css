@@ -1,0 +1,25 @@
+.info-list {
+    color: #333;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.info-list span {
+    text-transform: capitalize;
+}
+
+.info-list li {
+    margin-bottom: 0.5rem;
+}
+
+.info-list strong {
+    font-weight: 600;
+}
+
+@media screen and (min-width: 992px) {
+    .info-list {
+        font-size: 1.2rem;
+    }
+}

@@ -2,7 +2,7 @@ const pokemonList = document.getElementById('pokemonList')
 const loadMoreButton = document.getElementById('loadMoreButton')
 
 const maxRecords = 151
-const limit = 24
+const limit = 16
 let offset = 0;
 
 function loadPokemonItens(offset, limit) {
@@ -10,8 +10,8 @@ function loadPokemonItens(offset, limit) {
         const newHtml = pokemons.map((pokemon) => `
             <a href="pokemon.html?name=${pokemon.name}">
             <li class="pokemon ${pokemon.type}">
-                <span class="number">#${pokemon.number.toString().padStart(3, '0')}</span>
-                <span class="name">${pokemon.name}</span> 
+                <span class="pokemon-number">#${pokemon.number.toString().padStart(3, '0')}</span>
+                <span class="pokemon-name">${pokemon.name}</span> 
                 
                 <div class="detail">
                     <ol class="types">

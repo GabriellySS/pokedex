@@ -29,14 +29,14 @@
     transition: transform 0.2s ease-in-out;
 }
 
-.number {
+.pokemon-number {
     color: #000;
     opacity: .25;
     text-align: right;
     font-size: .625rem;
 }
 
-.name {
+.pokemon-name {
     color: #fff;
     font-weight: 600;
     text-transform: capitalize;

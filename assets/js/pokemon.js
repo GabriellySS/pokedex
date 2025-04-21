@@ -58,121 +58,50 @@ function generateTopMovesHTML(moves) {
     `
 }
 
-// Função onde o moves vai carregar só quando abrir a aba dele
-// function loadPokemonDetails() {
-//     const urlParams = new URLSearchParams(window.location.search)
-//     const pokemonName = urlParams.get('name')
+async function renderEvolutionChain(evolutions) {
+    const container = document.getElementById('evolution-list')
+    if (!container) return
 
-//     if (!pokemonName) return
+    container.innerHTML = ''
 
-//     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
-//         .then(res => res.json())
-//         .then(pokeDetail => convertPokeApiDetailToPokemon(pokeDetail))
-//         .then(pokemon => {
-//             const heightInMeters = (pokemon.height / 10).toFixed(1) + ' m'
-//             const weightInKg = (pokemon.weight / 10).toFixed(1) + ' kg'
+    for (const name of evolutions) {
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
+            const data = await response.json()
 
-//             const pokemonCard = document.querySelector('.pokemon-card')
+            const stage = document.createElement('div')
+            stage.className = 'evolution-stage'
 
-//             pokemonCard.innerHTML = `
-//             <main class="pokemon-card ${pokemon.type}">
-//                 <section class="header">
-//                     <div class="top-bar">
-//                         <i class="fa-solid fa-arrow-left back"></i>
-//                     </div>
-//                     <div class="detail">
-//                         <div class="detail-left">
-//                             <h1 class="name">${pokemon.name}</h1>
-//                             <ol class="types">
-//                                 ${pokemon.types.map((type) => `<li class="type card-${type}">${type}</li>`).join('')}
-//                             </ol>
-//                         </div>
-//                         <span class="number">#${pokemon.number.toString().padStart(3, '0')}</span>
-//                     </div>
+            stage.innerHTML = `
+          <img src="${data.sprites.other['official-artwork'].front_default}" alt="${name}">
+          <span>${data.name}</span>
+        `
+            container.appendChild(stage)
+        } catch (error) {
+            console.error('[ERROR] Failed to find evolution:', error)
+        }
+    }
+}
 
-//                     <img class="pokemon-img" src="${pokemon.photo}" alt="${pokemon.name}" />
-//                 </section>
+function renderLocations(locations) {
+    const list = document.getElementById('location-list')
+    if (!list) return
 
-//                 <section class="tabs-container">
-//                     <ul class="tabs">
-//                         <li class="tab active" data-tab="about">About</li>
-//                         <li class="tab" data-tab="stats">Stats</li>
-//                         <li class="tab" data-tab="moves">Moves</li>
-//                         <li class="tab" data-tab="evolution">Evolution</li>
-//                         <li class="tab" data-tab="location">Location</li>
-//                     </ul>
+    list.innerHTML = ''
 
-//                     <div class="tab-contents">
-//                         <div class="tab-content active" id="about">
-//                             <p class="description">
-//                                 ${pokemon.description}
-//                             </p>
+    if (locations.length === 0 || (locations.length === 1 && locations[0] === 'Location unknown')) {
+        const li = document.createElement('li')
+        li.textContent = 'No known wild locations.'
+        list.appendChild(li)
+        return
+    }
 
-//                             <ul class="info-list">
-//                                 <li><strong>Specie:</strong> ${pokemon.specie.replace(/ Pokémon$/i, '')}</li>
-//                                 <li><strong>Height:</strong> ${heightInMeters}</li>
-//                                 <li><strong>Weight:</strong> ${weightInKg}</li>
-//                                 <li><strong>Abilities:</strong> ${pokemon.abilities
-//                     .map(ability => ability.charAt(0).toUpperCase() + ability.slice(1))
-//                     .join(', ')}</li>
-//                             </ul>
-//                         </div>
-
-//                         <div class="tab-content" id="stats">
-//                             ${generateStatsHTML(pokemon.stats)}
-//                         </div>
-
-//                         <div class="tab-content" id="moves">
-//                             <p class="description">Loading moves...</p>
-//                         </div>
-
-//                         <div class="tab-content" id="evolution">
-//                             <p class="description">Soon...</p>
-//                         </div>
-
-//                         <div class="tab-content" id="location">
-//                             <p class="description">Soon...</p>
-//                         </div>
-//                     </div>
-//                 </section>
-
-//             </main>
-//             `
-
-//             getTopMovesWithDetails(pokemon.moves).then(topMoves => {
-//                 const movesContainer = document.getElementById('moves')
-//                 movesContainer.innerHTML = `
-//                     <p class="description">Top ${topMoves.length} strongest moves of ${pokemon.name}:</p>
-//                     ${generateTopMovesHTML(topMoves)}
-//                 `
-//             })
-
-
-//             // Botão de voltar
-//             document.querySelector('.back').addEventListener('click', () => {
-//                 window.location.href = 'index.html'
-//             })
-
-//             // Tabs funcionando
-//             const tabs = document.querySelectorAll(".tab");
-//             const contents = document.querySelectorAll(".tab-content");
-
-//             tabs.forEach((tab) => {
-//                 tab.addEventListener("click", () => {
-//                     const target = tab.getAttribute("data-tab");
-
-//                     tabs.forEach((t) => t.classList.remove('active'));
-//                     contents.forEach((c) => c.classList.remove('active'));
-
-//                     tab.classList.add('active');
-//                     document.getElementById(target).classList.add('active');
-//                 });
-//             })
-//         })
-//         .catch(err => {
-//             console.error('Erro ao carregar detalhes do Pokémon:', err)
-//         })
-// }
+    locations.forEach(location => {
+        const li = document.createElement('li')
+        li.textContent = location
+        list.appendChild(li)
+    })
+}
 
 async function loadPokemonDetails() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -191,74 +120,82 @@ async function loadPokemonDetails() {
         const heightInMeters = (pokemon.height / 10).toFixed(1) + ' m';
         const weightInKg = (pokemon.weight / 10).toFixed(1) + ' kg';
 
-        const pokemonCard = document.querySelector('.pokemon-card');
+        const pokemonContent = document.querySelector('.content-pokemon');
 
-        pokemonCard.innerHTML = `
-        <main class="pokemon-card ${pokemon.type}">
-            <section class="header">
-                <div class="top-bar">
-                    <i class="fa-solid fa-arrow-left back"></i>
-                </div>
-                <div class="detail">
-                    <div class="detail-left">
-                        <h1 class="name">${pokemon.name}</h1>
-                        <ol class="types">
-                            ${pokemon.types.map((type) => `<li class="type card-${type}">${type}</li>`).join('')}
-                        </ol>
+        pokemonContent.innerHTML = `
+        <main class="main">
+            <section class="content-pokemon ${pokemon.type}">
+                <section class="header">
+                    <div class="top-bar">
+                        <i class="fa-solid fa-arrow-left back"></i>
                     </div>
-                    <span class="number">#${pokemon.number.toString().padStart(3, '0')}</span>
-                </div>
-
-                <img class="pokemon-img" src="${pokemon.photo}" alt="${pokemon.name}" />
-            </section>
-
-            <section class="tabs-container">
-                <ul class="tabs">
-                    <li class="tab active" data-tab="about">About</li>
-                    <li class="tab" data-tab="stats">Stats</li>
-                    <li class="tab" data-tab="moves">Moves</li>
-                    <li class="tab" data-tab="evolution">Evolution</li>
-                    <li class="tab" data-tab="location">Location</li>
-                </ul>
-
-                <div class="tab-contents">
-                    <div class="tab-content active" id="about">
-                        <p class="description">
-                            ${pokemon.description}
-                        </p>
-
-                        <ul class="info-list">
-                            <li><strong>Specie:</strong> ${pokemon.specie.replace(/ Pokémon$/i, '')}</li>
-                            <li><strong>Height:</strong> ${heightInMeters}</li>
-                            <li><strong>Weight:</strong> ${weightInKg}</li>
-                            <li><strong>Abilities:</strong> ${pokemon.abilities
-                                .map(ability => ability.charAt(0).toUpperCase() + ability.slice(1))
-                                .join(', ')}</li>
-                        </ul>
+                    <div class="detail">
+                        <div class="detail-left">
+                            <h1 class="name">${pokemon.name}</h1>
+                            <ol class="types">
+                                ${pokemon.types.map((type) => `<li class="type card-${type}">${type}</li>`).join('')}
+                            </ol>
+                        </div>
+                        <span class="number">#${pokemon.number.toString().padStart(3, '0')}</span>
                     </div>
 
-                    <div class="tab-content" id="stats">
-                        ${generateStatsHTML(pokemon.stats)}
-                    </div>
+                    <img class="pokemon-img" src="${pokemon.photo}" alt="${pokemon.name}" />
+                </section>
 
-                    <div class="tab-content" id="moves">
-                        <p class="description">Top ${topMoves.length} strongest moves of ${pokemon.name}:</p>
-                        ${generateTopMovesHTML(topMoves)}
-                    </div>
+                <section class="tabs-container">
+                    <ul class="tabs">
+                        <li class="tab active" data-tab="about">About</li>
+                        <li class="tab" data-tab="stats">Stats</li>
+                        <li class="tab" data-tab="moves">Moves</li>
+                        <li class="tab" data-tab="evolution">Evolution</li>
+                        <li class="tab" data-tab="location">Location</li>
+                    </ul>
 
-                    <div class="tab-content" id="evolution">
-                        <p class="description">Soon...</p>
-                    </div>
+                    <div class="tab-contents">
+                        <div class="tab-content active" id="about">
+                            <p class="description">
+                                ${pokemon.description}
+                            </p>
 
-                    <div class="tab-content" id="location">
-                        <p class="description">Soon...</p>
+                            <ul class="info-list">
+                                <li><strong>Specie:</strong> ${pokemon.specie.replace(/ Pokémon$/i, '')}</li>
+                                <li><strong>Height:</strong> ${heightInMeters}</li>
+                                <li><strong>Weight:</strong> ${weightInKg}</li>
+                                <li><strong>Abilities:</strong> ${pokemon.abilities
+                    .map(ability => ability.charAt(0).toUpperCase() + ability.slice(1))
+                    .join(', ')}</li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content" id="stats">
+                            ${generateStatsHTML(pokemon.stats)}
+                        </div>
+
+                        <div class="tab-content" id="moves">
+                            <p class="description">Top ${topMoves.length} strongest moves of ${pokemon.name}:</p>
+                            ${generateTopMovesHTML(topMoves)}
+                        </div>
+
+                        <div class="tab-content" id="evolution">
+                            <h4>Evolutions</h4>
+                            <div id="evolution-list" class="evolution-list"></div>
+                        </div>
+
+                        <div class="tab-content" id="location">
+                            <h4>Location</h4>
+                            <ul id="location-list" class="location-list"></ul>
+                        </div>
                     </div>
-                </div>
+                </section>
             </section>
         </main>
         `;
 
-        pokemonCard.classList.remove('loading')
+        pokemonContent.classList.remove('loading')
+
+        renderEvolutionChain(pokemon.evolutions)
+
+        renderLocations(pokemon.locations)
 
         // Botão de voltar
         document.querySelector('.back').addEventListener('click', () => {
@@ -282,7 +219,7 @@ async function loadPokemonDetails() {
         });
 
     } catch (err) {
-        console.error('Erro ao carregar detalhes do Pokémon:', err);
+        console.error('ERROR] Failed to load Pokémon details:', error);
     }
 }
 

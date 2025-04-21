@@ -1,0 +1,39 @@
+.evolution-list {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    justify-content: space-around;
+  }
+  
+  .evolution-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .evolution-stage span {
+    color: #888;
+    text-transform: capitalize;
+    font-size: .8rem;
+    font-weight: 400;
+    margin-top: .25rem;
+  }
+  
+  .evolution-stage img {
+    width: 5.5rem;
+    padding: .5rem;
+    border: .15rem solid #888;
+    border-radius: 100%;
+  }
+
+  @media screen and (min-width: 992px) {
+    .evolution-stage span {
+      font-size: 1rem;
+    }
+
+    .evolution-stage img {
+      width: 7.5rem;
+      border: .25rem solid #888;
+    }
+  }
